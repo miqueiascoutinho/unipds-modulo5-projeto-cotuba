@@ -1,7 +1,8 @@
 package br.com.unipds;
 
-import java.nio.file.Path;
-import java.util.List;
+import br.com.unipds.dto.ParametrosProcessamento;
+import br.com.unipds.input.LeitorOpcoesCLI;
+import br.com.unipds.service.GeradorEbookService;
 
 public class Main {
 
@@ -15,37 +16,22 @@ public class Main {
     int executar(String[] args) {
 
         LeitorOpcoesCLI leitorOpcoesCLI = new LeitorOpcoesCLI();
+        boolean modoVerboso = true;
 
         try {
             leitorOpcoesCLI.executar(args);
-        } catch (Exception e) {
-            System.out.println("Erro no menu de opções " + e.getMessage());
-            return 1;
-        }
+            ParametrosProcessamento parametros = new ParametrosProcessamento();
 
-        Path diretorioDosMD = leitorOpcoesCLI.getDiretorioDosMD();
-        String formato = leitorOpcoesCLI.getFormato();
-        Path arquivoDeSaida = leitorOpcoesCLI.getArquivoDeSaida();
-        boolean modoVerboso = leitorOpcoesCLI.isModoVerboso();
+            parametros.setDiretorioMarkd(leitorOpcoesCLI.getDiretorioDosMD());
+            parametros.setFormato(leitorOpcoesCLI.getFormato());
+            parametros.setArquivoDeSaida(leitorOpcoesCLI.getArquivoDeSaida());
+            parametros.setModoVerboso(leitorOpcoesCLI.isModoVerboso());
+            modoVerboso = leitorOpcoesCLI.isModoVerboso();
 
-        try {
+            GeradorEbookService ebookService = new GeradorEbookService();
+            ebookService.gerarEbook(parametros);
 
-            RenderizadorHtml renderizadorHtml = new RenderizadorHtml();
-            List<String> htmls = renderizadorHtml.executar(diretorioDosMD);
-
-
-            if ("pdf".equals(formato)) {
-                GeradorPdf geradorPdf = new GeradorPdf();
-                geradorPdf.executar(htmls, arquivoDeSaida);
-            } else if ("epub".equals(formato)) {
-                GeradorEpub geradorEpub = new GeradorEpub();
-                geradorEpub.execute(htmls, arquivoDeSaida);
-
-            } else {
-                throw new IllegalArgumentException("Formato do ebook inválido: " + formato);
-            }
-
-            System.out.println("Arquivo gerado com sucesso: " + arquivoDeSaida);
+            System.out.println("Arquivo gerado com sucesso: " + parametros.getArquivoDeSaida());
             return 0;
 
         } catch (Exception ex) {

@@ -1,8 +1,10 @@
-package br.com.unipds;
+package br.com.unipds.input;
 
+import br.com.unipds.domain.FormatoEbook;
 import org.apache.commons.cli.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,11 +12,11 @@ import java.util.Comparator;
 
 public class LeitorOpcoesCLI {
     private Path diretorioDosMD;
-    private String formato;
+    private FormatoEbook formato;
     private Path arquivoDeSaida;
     private boolean modoVerboso = false;
 
-    void executar(String[] args){
+    public void executar(String[] args) {
         var options = new Options();
 
         var opcaoDeDiretorioDosMD = new Option("d", "dir", true,
@@ -59,11 +61,15 @@ public class LeitorOpcoesCLI {
             }
 
             String nomeDoFormatoDoEbook = cmd.getOptionValue("format");
-
             if (nomeDoFormatoDoEbook != null) {
-                formato = nomeDoFormatoDoEbook.toLowerCase();
+                try {
+                    formato = FormatoEbook.valueOf(nomeDoFormatoDoEbook.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Formato do ebook inválido: " + nomeDoFormatoDoEbook, e);
+                }
+
             } else {
-                formato = "pdf";
+                formato = FormatoEbook.PDF;
             }
 
             String nomeDoArquivoDeSaidaDoEbook = cmd.getOptionValue("output");
@@ -71,7 +77,7 @@ public class LeitorOpcoesCLI {
             if (nomeDoArquivoDeSaidaDoEbook != null) {
                 arquivoDeSaida = Paths.get(nomeDoArquivoDeSaidaDoEbook);
             } else {
-                arquivoDeSaida = Paths.get("book." + formato.toLowerCase());
+                arquivoDeSaida = Paths.get("book." + formato.name().toLowerCase());
             }
 
             if (Files.isDirectory(arquivoDeSaida)) {
@@ -83,7 +89,7 @@ public class LeitorOpcoesCLI {
             }
 
             modoVerboso = cmd.hasOption("verbose");
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             System.out.println("Erro: " + ex.getMessage());
             throw new IllegalStateException(ex);
         }
@@ -93,7 +99,7 @@ public class LeitorOpcoesCLI {
         return diretorioDosMD;
     }
 
-    public String getFormato() {
+    public FormatoEbook getFormato() {
         return formato;
     }
 

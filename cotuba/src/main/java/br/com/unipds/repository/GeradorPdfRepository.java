@@ -1,5 +1,7 @@
-package br.com.unipds;
+package br.com.unipds.repository;
 
+import br.com.unipds.domain.Capitulo;
+import br.com.unipds.domain.Livro;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfOutline;
@@ -13,23 +15,23 @@ import com.itextpdf.layout.properties.AreaBreakType;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
-public class GeradorPdf {
-    public void executar(List<String> htmls, Path arquivoSaida) throws IOException {
+public class GeradorPdfRepository {
+    public void executar(Livro livro) throws IOException {
 
-        try (var writer = new PdfWriter(Files.newOutputStream(arquivoSaida));
+        List<Capitulo> capitulos1 = livro.getCapitulos();
+
+        try (var writer = new PdfWriter(Files.newOutputStream(livro.getArquivoSaida()));
              var pdf = new PdfDocument(writer);
              var pdfDocument = new Document(pdf)) {
 
-            //TODO: definir título e autor para o livro
-            pdf.getDocumentInfo().setTitle("Livro");
-            pdf.getDocumentInfo().setAuthor("Autor");
+            pdf.getDocumentInfo().setTitle(livro.getNome());
+            pdf.getDocumentInfo().setAuthor(livro.getAutor());
 
-            htmls.forEach(html -> {
+            capitulos1.forEach(capitulo -> {
                 try {
-                    List<IElement> convertToElements = HtmlConverter.convertToElements(html);
+                    List<IElement> convertToElements = HtmlConverter.convertToElements(capitulo.getConteudoHtml());
 
                     if (pdf.getNumberOfPages() == 0) {
                         pdf.addNewPage();
@@ -40,8 +42,7 @@ public class GeradorPdf {
                         rootOutline = pdf.getOutlines(false);
                     }
 
-                    // TODO: usar título do capítulo
-                    PdfOutline chapterOutline = rootOutline.addOutline("Capítulo");
+                    PdfOutline chapterOutline = rootOutline.addOutline(capitulo.getTitulo());
                     chapterOutline.addDestination(PdfExplicitDestination.createFit(pdf.getLastPage()));
 
                     for (IElement element : convertToElements) {
