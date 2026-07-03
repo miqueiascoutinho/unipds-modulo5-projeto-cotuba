@@ -1,7 +1,7 @@
 package br.com.unipds;
 
 import br.com.unipds.dto.ParametrosProcessamento;
-import br.com.unipds.input.LeitorOpcoesCLI;
+import br.com.unipds.ui.LeitorOpcoesCLI;
 import br.com.unipds.service.GeradorEbookService;
 
 public class Main {

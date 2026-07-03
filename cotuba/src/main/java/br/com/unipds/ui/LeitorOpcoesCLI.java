@@ -1,4 +1,4 @@
-package br.com.unipds.input;
+package br.com.unipds.ui;
 
 import br.com.unipds.domain.FormatoEbook;
 import org.apache.commons.cli.*;
