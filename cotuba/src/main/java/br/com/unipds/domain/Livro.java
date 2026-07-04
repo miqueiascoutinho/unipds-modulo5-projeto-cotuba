@@ -8,6 +8,7 @@ public class Livro {
     private String autor;
     private List<Capitulo> capitulos;
     private Path arquivoSaida;
+    private FormatoEbook formatoEbook;
 
     public String getNome() {
         return nome;
@@ -39,5 +40,13 @@ public class Livro {
 
     public void setArquivoSaida(Path arquivoSaida) {
         this.arquivoSaida = arquivoSaida;
+    }
+
+    public FormatoEbook getFormatoEbook() {
+        return formatoEbook;
+    }
+
+    public void setFormatoEbook(FormatoEbook formatoEbook) {
+        this.formatoEbook = formatoEbook;
     }
 }

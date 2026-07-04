@@ -1,4 +1,7 @@
-package br.com.unipds.repository;
+package br.com.unipds.repository.impl;
+
+import br.com.unipds.repository.GestaoArquivos;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -8,7 +11,9 @@ import java.nio.file.PathMatcher;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class GestorArquivosRepository {
+@ApplicationScoped
+public class GestorArquivosDiretorio implements GestaoArquivos {
+    @Override
     public List<Path> obterArquivosMarkdown(Path diretorioMD) {
 
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**/*.md");

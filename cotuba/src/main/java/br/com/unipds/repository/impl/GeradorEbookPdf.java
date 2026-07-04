@@ -1,7 +1,8 @@
-package br.com.unipds.repository;
+package br.com.unipds.repository.impl;
 
 import br.com.unipds.domain.Capitulo;
 import br.com.unipds.domain.Livro;
+import br.com.unipds.repository.GeradorEbook;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfOutline;
@@ -12,15 +13,19 @@ import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.IElement;
 import com.itextpdf.layout.properties.AreaBreakType;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-public class GeradorPdfRepository {
-    public void executar(Livro livro) throws IOException {
+@ApplicationScoped @Named("geradorPdf")
+public class GeradorEbookPdf implements GeradorEbook {
 
-        List<Capitulo> capitulos1 = livro.getCapitulos();
+    public void gerarEbook(Livro livro) {
+
+        List<Capitulo> capitulos = livro.getCapitulos();
 
         try (var writer = new PdfWriter(Files.newOutputStream(livro.getArquivoSaida()));
              var pdf = new PdfDocument(writer);
@@ -29,7 +34,7 @@ public class GeradorPdfRepository {
             pdf.getDocumentInfo().setTitle(livro.getNome());
             pdf.getDocumentInfo().setAuthor(livro.getAutor());
 
-            capitulos1.forEach(capitulo -> {
+            capitulos.forEach(capitulo -> {
                 try {
                     List<IElement> convertToElements = HtmlConverter.convertToElements(capitulo.getConteudoHtml());
 
