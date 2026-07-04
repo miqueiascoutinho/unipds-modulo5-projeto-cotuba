@@ -1,6 +1,8 @@
 package br.com.unipds.repository.impl;
 
+import br.com.unipds.FormatoEbookQualifier;
 import br.com.unipds.domain.Capitulo;
+import br.com.unipds.domain.FormatoEbook;
 import br.com.unipds.domain.Livro;
 import br.com.unipds.repository.GeradorEbook;
 import com.itextpdf.html2pdf.HtmlConverter;
@@ -14,13 +16,13 @@ import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.IElement;
 import com.itextpdf.layout.properties.AreaBreakType;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Named;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-@ApplicationScoped @Named("geradorPdf")
+@FormatoEbookQualifier(FormatoEbook.PDF)
+@ApplicationScoped
 public class GeradorEbookPdf implements GeradorEbook {
 
     public void gerarEbook(Livro livro) {

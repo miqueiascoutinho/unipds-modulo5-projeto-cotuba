@@ -1,10 +1,11 @@
 package br.com.unipds.repository.impl;
 
+import br.com.unipds.FormatoEbookQualifier;
 import br.com.unipds.domain.Capitulo;
+import br.com.unipds.domain.FormatoEbook;
 import br.com.unipds.domain.Livro;
 import br.com.unipds.repository.GeradorEbook;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Named;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.GuideReference;
@@ -16,7 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-@ApplicationScoped @Named("geradorEpub")
+@FormatoEbookQualifier(FormatoEbook.EPUB)
+@ApplicationScoped
 public class GeradorEbookEpub implements GeradorEbook {
     public void gerarEbook(Livro livro) {
         List<Capitulo> capitulos1 = livro.getCapitulos();
