@@ -1,6 +1,7 @@
 package br.com.unipds.ui;
 
 import br.com.unipds.domain.FormatoEbook;
+import br.com.unipds.dto.ParametrosProcessamento;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.cli.*;
 
@@ -13,12 +14,14 @@ import java.util.Comparator;
 
 @ApplicationScoped
 public class LeitorOpcoesCLI {
-    private Path diretorioDosMD;
-    private FormatoEbook formato;
-    private Path arquivoDeSaida;
-    private boolean modoVerboso = false;
 
-    public void executar(String[] args) {
+    public ParametrosProcessamento executar(String[] args) {
+
+        Path diretorioDosMD;
+        FormatoEbook formato;
+        Path arquivoDeSaida;
+        boolean modoVerboso;
+
         var options = new Options();
 
         var opcaoDeDiretorioDosMD = new Option("d", "dir", true,
@@ -95,21 +98,7 @@ public class LeitorOpcoesCLI {
             System.out.println("Erro: " + ex.getMessage());
             throw new IllegalStateException(ex);
         }
-    }
 
-    public Path getDiretorioDosMD() {
-        return diretorioDosMD;
-    }
-
-    public FormatoEbook getFormato() {
-        return formato;
-    }
-
-    public Path getArquivoDeSaida() {
-        return arquivoDeSaida;
-    }
-
-    public boolean isModoVerboso() {
-        return modoVerboso;
+        return new ParametrosProcessamento(diretorioDosMD, formato, arquivoDeSaida, modoVerboso);
     }
 }

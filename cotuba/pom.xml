@@ -10,6 +10,7 @@
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <record.builder.version>53</record.builder.version>
     </properties>
     <dependencies>
         <dependency>
@@ -44,6 +45,14 @@
             <artifactId>weld-se-shaded</artifactId>
             <version>6.0.3.Final</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.soabase.record-builder</groupId>
+            <artifactId>record-builder-core</artifactId>
+            <version>${record.builder.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -85,6 +94,19 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>io.soabase.record-builder</groupId>
+                            <artifactId>record-builder-processor</artifactId>
+                            <version>${record.builder.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -21,21 +21,21 @@ import java.util.List;
 @ApplicationScoped
 public class GeradorEbookEpub implements GeradorEbook {
     public void gerarEbook(Livro livro) {
-        List<Capitulo> capitulos1 = livro.getCapitulos();
+        List<Capitulo> capitulos1 = livro.capitulos();
         try {
             var epub = new Book();
 
             //TODO: definir título e autor para o livro
-            epub.getMetadata().addTitle(livro.getNome());
-            epub.getMetadata().addAuthor(new Author(livro.getAutor()));
+            epub.getMetadata().addTitle(livro.titulo());
+            epub.getMetadata().addAuthor(new Author(livro.autor()));
 
             boolean[] ehPrimeiroCapitulo = {true};
 
             capitulos1.forEach(capitulo -> {
-                var html = capitulo.getConteudoHtml();
+                var html = capitulo.conteudoHTML();
 
                 var chapter = new Resource(html.getBytes(), MediatypeService.XHTML);
-                epub.addSection(capitulo.getTitulo(), chapter);
+                epub.addSection(capitulo.titulo(), chapter);
 
                 if (ehPrimeiroCapitulo[0]) {
                     epub.getGuide().addReference(new GuideReference(chapter, "text", "Start Reading"));
@@ -45,14 +45,14 @@ public class GeradorEbookEpub implements GeradorEbook {
                 var epubWriter = new EpubWriter();
 
                 try {
-                    epubWriter.write(epub, Files.newOutputStream(livro.getArquivoSaida()));
+                    epubWriter.write(epub, Files.newOutputStream(livro.arquivoSaida()));
                 } catch (IOException ex) {
-                    throw new IllegalStateException("Erro ao criar arquivo EPUB: " + livro.getArquivoSaida().toAbsolutePath(), ex);
+                    throw new IllegalStateException("Erro ao criar arquivo EPUB: " + livro.arquivoSaida().toAbsolutePath(), ex);
                 }
             });
 
         } catch (Exception ex) {
-            throw new IllegalStateException("Erro ao gerar EPUB: " + livro.getArquivoSaida().toAbsolutePath(), ex);
+            throw new IllegalStateException("Erro ao gerar EPUB: " + livro.arquivoSaida().toAbsolutePath(), ex);
         }
     }
 }

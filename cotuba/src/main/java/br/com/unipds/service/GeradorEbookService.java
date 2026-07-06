@@ -3,6 +3,7 @@ package br.com.unipds.service;
 import br.com.unipds.FormatoEbookFilter;
 import br.com.unipds.domain.Capitulo;
 import br.com.unipds.domain.Livro;
+import br.com.unipds.domain.Markdown;
 import br.com.unipds.dto.ParametrosProcessamento;
 import br.com.unipds.repository.GeradorEbook;
 import br.com.unipds.repository.GestaoArquivos;
@@ -12,7 +13,6 @@ import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 
-import java.nio.file.Path;
 import java.util.List;
 
 @ApplicationScoped
@@ -31,21 +31,19 @@ public class GeradorEbookService {
 
     public void gerarEbook(ParametrosProcessamento parametros) {
         try {
-            List<Path> paths = gestorArquivosRepository.obterArquivosMarkdown(parametros.getDiretorioMarkd());
+            List<Markdown> markdowns = gestorArquivosRepository.obterArquivosMarkdown(parametros.diretorioMarkd());
 
-            List<Capitulo> capitulos = renderizadorMarkdown.executar(paths);
+            List<Capitulo> capitulos = renderizadorMarkdown.executar(markdowns);
 
-            Livro livro = new Livro();
-            livro.setCapitulos(capitulos);
 
             //TODO: Implementar
-            livro.setAutor("Autor Teste");
-            livro.setNome("Livro Qualquer");
-            livro.setArquivoSaida(parametros.getArquivoDeSaida());
-            livro.setFormatoEbook(parametros.getFormato());
+            var autor = "Autor Teste";
+            var titulo = "Livro Qualquer";
+
+            var livro = new Livro(titulo, autor, capitulos, parametros.arquivoDeSaida(), parametros.formato());
 
 
-            GeradorEbook geradorEbook = geradorEbooks.select(FormatoEbookFilter.of(livro.getFormatoEbook())).get();
+            GeradorEbook geradorEbook = geradorEbooks.select(FormatoEbookFilter.of(livro.formatoEbook())).get();
             geradorEbook.gerarEbook(livro);
         } catch (Exception ex) {
             System.out.println("Erro ao gerar Ebook: " + ex.getMessage());

@@ -1,6 +1,8 @@
 package br.com.unipds.repository.impl;
 
 import br.com.unipds.domain.Capitulo;
+import br.com.unipds.domain.CapituloBuilder;
+import br.com.unipds.domain.Markdown;
 import br.com.unipds.repository.RenderizadorMarkdown;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.commonmark.node.AbstractVisitor;
@@ -12,32 +14,28 @@ import org.commonmark.renderer.html.HtmlRenderer;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class RenderizadorMarkdownCommonmark implements RenderizadorMarkdown {
     @Override
-    public List<Capitulo> executar(List<Path> arquivosMarkdown) {
+    public List<Capitulo> executar(List<Markdown> markdowns) {
 
-        return arquivosMarkdown.stream().map(arquivo -> {
-            Capitulo capitulo = new Capitulo();
+        return markdowns.stream().map(markdown -> {
+            CapituloBuilder capituloBuilder = CapituloBuilder.builder();
 
             try {
-                capitulo.setConteudoMarkdown(Files.readString(arquivo));
                 Parser parser = Parser.builder().build();
 
-                Node document = parser.parse(capitulo.getConteudoMarkdown());
+                Node document = parser.parse(markdown.conteudo());
 
                 document.accept(new AbstractVisitor() {
                     @Override
                     public void visit(Heading heading) {
                         if (heading.getLevel() == 1) {
                             // capítulo
-                            String tituloDoCapitulo = ((Text) heading.getFirstChild()).getLiteral();
-                            capitulo.setTitulo(tituloDoCapitulo);
+                            capituloBuilder.titulo(((Text) heading.getFirstChild()).getLiteral());
                         } else if (heading.getLevel() == 2) {
                             // seção
                         } else if (heading.getLevel() == 3) {
@@ -58,20 +56,18 @@ public class RenderizadorMarkdownCommonmark implements RenderizadorMarkdown {
                     htmlRoot.attr("xmlns", "http://www.w3.org/1999/xhtml");
                 }
 
-                // 3. Define o título (o jsoup faz o escape automático do texto)
-                doc.title(capitulo.getTitulo());
-
                 // 4. Injeta o HTML renderizado dentro do body (preservando as tags do renderer)
                 doc.body().append(html);
 
                 // 5. Obtém a string final estruturada
                 String envelopeHtml = doc.outerHtml();
 
-                capitulo.setConteudoHtml(envelopeHtml);
-                return capitulo;
+                return capituloBuilder.conteudoHTML(envelopeHtml)
+                        .markdown(markdown)
+                        .build();
 
             } catch (Exception ex) {
-                throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + arquivo, ex);
+                throw new IllegalStateException("Erro ao renderizar para HTML o arquivo " + markdown.arquivo(), ex);
             }
 
         }).collect(Collectors.toList());

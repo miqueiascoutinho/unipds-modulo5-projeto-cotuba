@@ -21,14 +21,14 @@ public class GeradorEbookHtml implements GeradorEbook {
 
     @Override
     public void gerarEbook(Livro livro) {
-        Path arquivoSaida = livro.getArquivoSaida();
+        Path arquivoSaida = livro.arquivoSaida();
         Map<Capitulo, Path> arquivosHTMLs = new LinkedHashMap<>();
 
         try {
             Path diretorioHtml = Files.createDirectory(arquivoSaida);
 
             int i = 1;
-            for (Capitulo capitulo : livro.getCapitulos()) {
+            for (Capitulo capitulo : livro.capitulos()) {
                 String nomeCapitulo = obterNomeCapituloHTML(i, capitulo);
                 Path arquivohtml = diretorioHtml.resolve(nomeCapitulo);
 
@@ -54,7 +54,7 @@ public class GeradorEbookHtml implements GeradorEbook {
 
                     return """
                             <li><a href="%s">%s</a></li>
-                            """.formatted(arquivo.getFileName(), capitulo.getTitulo());
+                            """.formatted(arquivo.getFileName(), capitulo.titulo());
                 }
         ).collect(Collectors.joining());
 
@@ -91,13 +91,13 @@ public class GeradorEbookHtml implements GeradorEbook {
                     %s
                 </body>
                 </html>
-                """.formatted(capitulo.getTitulo(), capitulo.getConteudoHtml());
+                """.formatted(capitulo.titulo(), capitulo.conteudoHTML());
 
         Files.writeString(arquivoHTML, html, StandardCharsets.UTF_8);
     }
 
     private String obterNomeCapituloHTML(int seq, Capitulo capitulo) {
-        String tituloLimpo = capitulo.getTitulo().toLowerCase().replaceAll("\\W", "");
+        String tituloLimpo = capitulo.titulo().toLowerCase().replaceAll("\\W", "");
         return "%02d-%s.html".formatted(seq, tituloLimpo);
     }
 }

@@ -5,6 +5,7 @@ import br.com.unipds.domain.Capitulo;
 import br.com.unipds.domain.FormatoEbook;
 import br.com.unipds.domain.Livro;
 import br.com.unipds.repository.GeradorEbook;
+
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfOutline;
@@ -27,18 +28,18 @@ public class GeradorEbookPdf implements GeradorEbook {
 
     public void gerarEbook(Livro livro) {
 
-        List<Capitulo> capitulos = livro.getCapitulos();
+        List<Capitulo> capitulos = livro.capitulos();
 
-        try (var writer = new PdfWriter(Files.newOutputStream(livro.getArquivoSaida()));
+        try (var writer = new PdfWriter(Files.newOutputStream(livro.arquivoSaida()));
              var pdf = new PdfDocument(writer);
              var pdfDocument = new Document(pdf)) {
 
-            pdf.getDocumentInfo().setTitle(livro.getNome());
-            pdf.getDocumentInfo().setAuthor(livro.getAutor());
+            pdf.getDocumentInfo().setTitle(livro.titulo());
+            pdf.getDocumentInfo().setAuthor(livro.autor());
 
             capitulos.forEach(capitulo -> {
                 try {
-                    List<IElement> convertToElements = HtmlConverter.convertToElements(capitulo.getConteudoHtml());
+                    List<IElement> convertToElements = HtmlConverter.convertToElements(capitulo.conteudoHTML());
 
                     if (pdf.getNumberOfPages() == 0) {
                         pdf.addNewPage();
@@ -49,7 +50,7 @@ public class GeradorEbookPdf implements GeradorEbook {
                         rootOutline = pdf.getOutlines(false);
                     }
 
-                    PdfOutline chapterOutline = rootOutline.addOutline(capitulo.getTitulo());
+                    PdfOutline chapterOutline = rootOutline.addOutline(capitulo.titulo());
                     chapterOutline.addDestination(PdfExplicitDestination.createFit(pdf.getLastPage()));
 
                     for (IElement element : convertToElements) {
